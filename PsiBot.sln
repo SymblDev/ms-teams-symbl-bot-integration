@@ -1,0 +1,56 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 17
+VisualStudioVersion = 17.0.32112.339
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "PsiBot", "PsiBot", "{A4568F3B-672B-4570-AC90-1C51352B0017}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Documentation", "Documentation", "{37062A6A-B33A-4631-A8AB-28DE58C39D7D}"
+	ProjectSection(SolutionItems) = preProject
+		Readme.md = Readme.md
+	EndProjectSection
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "PsiBot.Service", "PsiBot.Service\PsiBot.Service.csproj", "{6D503CD8-55B3-4013-9C58-846A0D774EEF}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "PsiBot.Model", "PsiBot.Model\PsiBot.Model.csproj", "{6A54B13F-4908-4831-A8E8-2D97CA06BF88}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "TeamsBot", "TeamsBot\TeamsBot.csproj", "{6F29E7B0-4DE9-4474-8899-EC34F7E9FAB8}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "TeamsBotSample", "TeamsBotSample\TeamsBotSample.csproj", "{54B7EBD4-B75A-4A79-A282-2822C1FEEF77}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{6D503CD8-55B3-4013-9C58-846A0D774EEF}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{6D503CD8-55B3-4013-9C58-846A0D774EEF}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{6D503CD8-55B3-4013-9C58-846A0D774EEF}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{6D503CD8-55B3-4013-9C58-846A0D774EEF}.Release|Any CPU.Build.0 = Release|Any CPU
+		{6A54B13F-4908-4831-A8E8-2D97CA06BF88}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{6A54B13F-4908-4831-A8E8-2D97CA06BF88}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{6A54B13F-4908-4831-A8E8-2D97CA06BF88}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{6A54B13F-4908-4831-A8E8-2D97CA06BF88}.Release|Any CPU.Build.0 = Release|Any CPU
+		{6F29E7B0-4DE9-4474-8899-EC34F7E9FAB8}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{6F29E7B0-4DE9-4474-8899-EC34F7E9FAB8}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{6F29E7B0-4DE9-4474-8899-EC34F7E9FAB8}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{6F29E7B0-4DE9-4474-8899-EC34F7E9FAB8}.Release|Any CPU.Build.0 = Release|Any CPU
+		{54B7EBD4-B75A-4A79-A282-2822C1FEEF77}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{54B7EBD4-B75A-4A79-A282-2822C1FEEF77}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{54B7EBD4-B75A-4A79-A282-2822C1FEEF77}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{54B7EBD4-B75A-4A79-A282-2822C1FEEF77}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(NestedProjects) = preSolution
+		{6D503CD8-55B3-4013-9C58-846A0D774EEF} = {A4568F3B-672B-4570-AC90-1C51352B0017}
+		{6A54B13F-4908-4831-A8E8-2D97CA06BF88} = {A4568F3B-672B-4570-AC90-1C51352B0017}
+		{6F29E7B0-4DE9-4474-8899-EC34F7E9FAB8} = {A4568F3B-672B-4570-AC90-1C51352B0017}
+		{54B7EBD4-B75A-4A79-A282-2822C1FEEF77} = {A4568F3B-672B-4570-AC90-1C51352B0017}
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {6015BE40-5CC8-4F5A-B3F1-1FF317F38F40}
+	EndGlobalSection
+EndGlobal
