@@ -1,3 +1,4 @@
+The MS Teams Symbl Integration Guide focuses on the local development where you can use your Windows Machine for development or testing. There's also a dedicated section for Azure Development where you can spin up the Azure VM and develop or deploy the solution.
 
 ## Local Development Guide
 
@@ -571,7 +572,7 @@ If you have completed Step 5, then you should be able to run the PsiBot Applicat
 
 ## Community
 
-If you have any questions, feel free to reach out to us at devrelations@symbl.ai or through our[Community Slack](https://join.slack.com/t/symbldotai/shared_invite/zt-4sic2s11-D3x496pll8UHSJ89cm78CA) or our[forum](https://community.symbl.ai/?_ga=2.134156042.526040298.1609788827-1505817196.1609788827).
+If you have any questions, feel free to reach out to us at devrelations@symbl.ai or through our [Community Slack](https://join.slack.com/t/symbldotai/shared_invite/zt-4sic2s11-D3x496pll8UHSJ89cm78CA) or our [forum](https://community.symbl.ai/?_ga=2.134156042.526040298.1609788827-1505817196.1609788827).
 
 This guide is actively developed, and we love to hear from you! Please feel free to [create an issue](https://github.com/SymblDev/symbl-livekit-rtc-app/issues) or [open a pull request](https://github.com/SymblDev/symbl-livekit-rtc-app/pulls) with your questions, comments, suggestions, and feedback. If you liked our integration guide, please star our repo!
 
