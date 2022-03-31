@@ -540,11 +540,11 @@ Please make sure to clone or download the following repo on your local machine. 
 
 ## Step 7: Running the Bot
 
-Make sure to follow the &quot; **MS Teams - Symbl Integration - Local Development Guide**&quot; Step 9 on how to run the bot, with the URL as mentioned during the run of **ngrok start --all --config ngrok.yml**
+Make sure to follow the "**MS Teams - Symbl Integration - Local Development Guide**" Step 9 on how to run the bot, with the URL as mentioned during the run of **ngrok start --all --config ngrok.yml**
 
 ![NgrOkVM](https://user-images.githubusercontent.com/2565797/160811055-2bbff9fb-1221-4a62-918b-e5323e10fe81.png)
 
-If you have completed Step 5, then you should be able to run the PsiBot Application with the application URL as **vm.{mydomain}.com**** /manage**
+If you have completed Step 5, then you should be able to run the PsiBot Application with the application URL as **vm.{mydomain}.com/manage**
 
 ![VMTeamsSybmlAppUI](https://user-images.githubusercontent.com/2565797/160811085-c9c3f737-a174-4031-96c9-d0e1986ca656.png)
  
