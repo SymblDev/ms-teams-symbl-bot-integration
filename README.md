@@ -1,4 +1,4 @@
-This is a POC which shows how to integrate [Symbl.ai](https://symbl.ai/) with MS Teams and getting per participant the meeting conversation transcripts and insights in real-time using an existing sample application created by MS Platform for Situated Intelligence ([Psi](https://github.com/microsoft/psi)) Teams bot. You can find more details on the original code created by MS Psi Teams bot sample application here microsoft-graph-comms-samples.
+This is a POC which shows how to integrate [Symbl.ai](https://symbl.ai/) with MS Teams and getting per participant the meeting conversation transcripts and insights in real-time using an existing sample application created by MS Platform for Situated Intelligence ([Psi](https://github.com/microsoftgraph/microsoft-graph-comms-samples/tree/master/Samples/PublicSamples/PsiBot)) Teams bot. You can find more details on the original code created by MS Psi Teams bot sample application here microsoft-graph-comms-samples.
 
 The MS Teams Symbl Integration Guide focuses on the local development where you are free to use your "Windows" machine for development/testting or may use the Azure infrastructure too. Up next, you'll see a dedicated section for "Azure" Development; Where you can spin up the Azure VM and develop or deploy the solution.
 
@@ -8,7 +8,7 @@ The MS Teams Symbl Integration Guide focuses on the local development where you 
 <summary>Click to expand!</summary>
   
 
-In this playbook, you will be presented with the MS Teams and Sybml integration to get real-time transcriptions and insights using Symbl APIs. We will be leveraging and extending the Psi Bot which is an open-source MS Teams Bot implementation developed by MS [Platform for Situated Intelligence (\psi)](https://github.com/microsoft/psi).
+In this playbook, you will be presented with the MS Teams and Sybml integration to get real-time transcriptions and insights using Symbl APIs. We will be leveraging and extending the Psi Bot which is an open-source MS Teams Bot implementation developed by MS [Platform for Situated Intelligence (\psi)](https://github.com/microsoftgraph/microsoft-graph-comms-samples/tree/master/Samples/PublicSamples/PsiBot).
 
 Before taking a deep dive into the internals of the MS Teams Bot implementation, let&#39;s try to understand what is a &quot;Bot&quot;, then get a basic understanding of the Psi Bot, Symbl API capabilities etc.
 
@@ -43,7 +43,7 @@ Symbl&#39;s APIs empower developers to enable:
 
 Teams bots can be developed which participate in Teams meetings much the same way humans do; joining calls, consuming participant video and audio streams, and producing their own audio and video as well as screen-sharing streams.
 
-[Platform for Situated Intelligence (\psi)](https://github.com/microsoft/psi) is an open, extensible framework for the development and research of multimodal, integrative-AI systems. The framework is particularly well-suited for developing AI systems that perform audio-visual processing in real-time interactions.
+[Platform for Situated Intelligence (\psi)](https://github.com/microsoftgraph/microsoft-graph-comms-samples/tree/master/Samples/PublicSamples/PsiBot) is an open, extensible framework for the development and research of multimodal, integrative-AI systems. The framework is particularly well-suited for developing AI systems that perform audio-visual processing in real-time interactions.
 
 In order to help accelerate the development of Teams bots with real-time audio and video capabilities, we have created this sample application which shows how you can integrate \psi with the Teams bot architecture to develop bots that can participate in live meetings, [visualize and debug](https://github.com/microsoft/psi/wiki/Psi-Studio) your implementation, and iterate quickly offline from persisted data.
 
@@ -56,8 +56,8 @@ This is a sample MS Teams bot implementation and may be used as a starting point
 
 The following projects comprise this sample:
 
-- [**PsiBot**](https://github.com/SymblDev/ms-teams-symbl-bot-integration/tree/main/PsiBot.Service) - This is the bot itself. It contains boilerplate code that handles all the mechanics of hosting a Teams bot. This is also where we embed our \psi implementation (inside the [PsiBot.Service](https://github.com/SymblDev/ms-teams-symbl-bot-integration/tree/main/PsiBot.Service) project).
-- [**TeamsBot**](https://github.com/SymblDev/ms-teams-symbl-bot-integration/tree/main/TeamsBot) - This project simply contains the ITeamsBot interface, which is used to create your \psi pipeline that can be plugged into the Teams bot infrastructure directly (i.e., as a drop-in replacement inside [PsiBot.Service](https://github.com/SymblDev/ms-teams-symbl-bot-integration/tree/main/PsiBot.Service) or used in offline testing ([TeamsBotTester](https://github.com/SymblDev/ms-teams-symbl-bot-integration/tree/main/TeamsBotTester)).
+- [**PsiBot**](https://github.com/microsoftgraph/microsoft-graph-comms-samples/tree/master/Samples/PublicSamples/PsiBot) - This is the bot itself. It contains boilerplate code that handles all the mechanics of hosting a Teams bot. This is also where we embed our \psi implementation (inside the [PsiBot.Service](https://github.com/SymblDev/ms-teams-symbl-bot-integration/tree/main/PsiBot.Service) project).
+- [**TeamsBot**](https://github.com/SymblDev/ms-teams-symbl-bot-integration/tree/main/TeamsBot) - This project simply contains the ITeamsBot interface, which is used to create your \psi pipeline that can be plugged into the Teams bot infrastructure directly.
 - [**TeamsBotSample**](https://github.com/SymblDev/ms-teams-symbl-bot-integration/tree/main/TeamsBotSample) - Contains two sample implementations of the ITeamsBot interface. Both of these examples consume participant audio and video and visualize engagement by producing a screen-share video stream, either via a &quot;bouncing ball&quot; or by scaling video thumbnails.
 
 ##
