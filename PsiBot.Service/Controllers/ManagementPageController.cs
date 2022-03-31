@@ -45,17 +45,26 @@ namespace PsiBot.Services.Controllers
                                             // Let us open a web socket
                                             var ws = new WebSocket(url);
 
-                                            ws.onmessage = function(evt) {
-                                                var received_msg = evt.data;
+                                            wsSubscriberDict[callId] = ws;
+
+                                            ws.onmessage = function(event) {
+
+                                                var received_msg = event.data;
                                                 console.log(received_msg);
                                                 const jsonResponse = JSON.parse(received_msg);
-                                                if(jsonResponse.message.type != ""undefined"" &&
-                                                    jsonResponse.message.type == 'recognition_result')
+
+                                                if (jsonResponse.type === 'message' && jsonResponse.message.type === 'conversation_completed') {
+                                                    console.log('conversationId: '+ jsonResponse.message.conversationId);
+                                                    document.getElementById('conversationId'+callId).innerHTML = 'Conversation Id: '+ jsonResponse.message.conversationId;
+                                                }
+
+                                                if(jsonResponse.message.type === 'recognition_result')
                                                 {
                                                     document.getElementById('speaker'+callId).innerHTML = 'Speaker: '+ jsonResponse.message.user.name;
                                                     document.getElementById('cc-text'+callId).innerHTML = jsonResponse.message.punctuated.transcript;
                                                     scrollToBottom('cc-text'+callId);
                                                 }
+                                               
                                             };
 
                                             ws.onclose = function() {
@@ -150,7 +159,13 @@ namespace PsiBot.Services.Controllers
                                       xhr.send(JSON.stringify(payload));
                                   }
                                   else {
-                                      xhr.send();
+                                      try
+                                      {
+                                         xhr.send();
+                                      }
+                                      catch(err) {
+                                        console.log(err);
+                                      }
                                   }
                               }
                               function join(meetingUrl) {
@@ -167,30 +182,35 @@ namespace PsiBot.Services.Controllers
                               }
                               function getSubscribeInfo(callid){
                                   api('GET', 'subscribe-info/'+ callid, null, rsp => {
-                                      var htm = '<h2 style=""text-align:left;padding-left:10px;"" class=""card-title"">'+ ""Subscribe API URL: "" + '</h2>';
-                                      if (rsp) {
+
+                                      var subscriberInfo = $('#subscriberInfo'+ callid);
+                                      var subscriberBtn = $('#subscriberBtn'+ callid);
+                                      var htm = '<h2 style=""text-align:left;padding-left:10px;"" id=\''+ ""conversationId"" + callid + '\'></h2>';
+                                     
+                                      htm += '<h2 style=""text-align:left;padding-left:10px;"" class=""card-title"">'+ ""Subscribe API URL: "" + '</h2>';
+                                      if (rsp && rsp != 'Unable to build the subscribe api link') {
                                           var jsonResponse = JSON.parse(rsp);
                                           htm += '<div style=""text-align:left;padding:10px;word-wrap:break-word;"" class=""jumbotron"">'+ jsonResponse.url + '</div><br/>';
                                           htm += '<div class=""speaker"" id=\''+ ""speaker"" + callid + '\'></div><div class=""cc"" id=\''+ ""cc"" + callid + '\'>';
                                           htm += '<span class=""cc-text"" id=\''+ ""cc-text"" + callid + '\'>Begin speaking.</span></div>';
                                       }
-                                      if(rsp){
-                                        var subscriberInfo = $('#subscriberInfo'+ callid);
-                                        var subscriberBtn = $('#subscriberBtn'+ callid);
+                                      if (rsp && rsp != 'Unable to build the subscribe api link') {
                                         subscriberInfo.html(htm);
 
-                                        var isSubscribed = wsSubscriberDict[callid];
-                                        if(!isSubscribed){
-                                            SubscribeToWebSocket(jsonResponse.url, callid);
-                                            wsSubscriberDict[callid] = true;
+                                        var ws = wsSubscriberDict[callid];
+                                        if ( typeof(ws) !== ""undefined"" && ws !== null ) {
+                                            ws.close();
+                                            delete wsSubscriberDict[callid];
                                         }
-                                        if($(subscriberBtn).text() == ""Show Subscriber""){  
-                                            $(subscriberInfo).css('display', 'block');
-                                            $(subscriberBtn).text('Hide Subscriber');
-                                        }else{
-                                            $(subscriberInfo).css('display', 'none');
-                                            $(subscriberBtn).text('Show Subscriber');
-                                        }
+                                      }
+                                       
+                                      if($(subscriberBtn).text() == ""Show Subscriber""){  
+                                        $(subscriberInfo).css('display', 'block');
+                                        $(subscriberBtn).text('Hide Subscriber');
+                                        SubscribeToWebSocket(jsonResponse.url, callid);
+                                      }else{
+                                        $(subscriberInfo).css('display', 'none');
+                                        $(subscriberBtn).text('Show Subscriber');
                                       }
                                   });   
                               }
