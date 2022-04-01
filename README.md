@@ -571,6 +571,41 @@ If you have completed Step 5, then you should be able to run the PsiBot Applicat
 [https://docs.microsoft.com/en-us/azure/virtual-machines/](https://docs.microsoft.com/en-us/azure/virtual-machines/)
 [https://docs.microsoft.com/en-us/azure/virtual-machines/windows/quick-create-portal](https://docs.microsoft.com/en-us/azure/virtual-machines/windows/quick-create-portal)
 
+  
+## Troubleshooting
+  
+Here is what you can do to troubleshoot the application. In case of issues, you are advised to take a look at the log file located with in the PsiBot.Service -> bin -> Debug -> net48 folder. You should see the log file with the name starts with "Symbl-log" appended with the current date.
+  
+<img width="624" alt="Screenshot 2022-04-01 at 4 53 09 PM" src="https://user-images.githubusercontent.com/2565797/161254280-0df76e9d-ea3e-4b25-be8b-0f4e7f35faeb.png">
+
+The application log has the following - Unique Meeting Id aka the Sybml Connection Id. Conversation Id, Access Token etc. In case, if you would like to reach our support (through our [Community Slack](https://join.slack.com/t/symbldotai/shared_invite/zt-4sic2s11-D3x496pll8UHSJ89cm78CA) or our [forum](https://community.symbl.ai/?_ga=2.134156042.526040298.1609788827-1505817196.1609788827)), please provide them with the Connection Id, Conversation Id etc. so that will help in debugging or troubleshooting.
+  
+The MS Teams App UI also has the capability to show the "Conversation Id" upon completion of the conversation. However, it shows up in the end say when the conversations gets completed with the response as isFinal = true which means the transcription is finalized or completed.
+  
+Here are the most common questions and their resolution.
+  
+1) Clicking on the "Show Subscribe" Button is not working or showing up the info?
+  
+The Sybml websocket connection take about 3 to 5 seconds. Please wait and then retry. You can also do an inspect element to see what is going on your browser "Console". If the subscribe is successful, you should be able to see the "recognition" messages from Symbl.
+  
+2) How to get the "Subscribe URL" for listening or debugging purpose?
+
+On the MS Teams App, there's a "Show/Hide" Subscribe Button. Please click on it to view the Subscribe WebSocket URL. Copy that and make use of it to run the Subscribe Program to get the conversation response for the active Websocket Connection.
+  
+3) Has "Live captioning" accuracy issues?
+ 
+There are various reason why the transcription might not be accurate or has issues. Various factor matters like noisy environment, accent, speaking fluency etc. Clarify of speech is highly critical. Also, please make sure to follow this [link](https://www.howtogeek.com/726145/how-to-reduce-and-disable-background-noise-in-microsoft-teams/) to update the MS Teams Desktop App Device Settings to disable the background noise.
+  
+4) How to record the media (audio/video)?
+
+Note - This one is optional. Symbl integration doesn't require the audio to be saved on disk. 
+
+However, If you would like to record the media, please make sure to set the appSetting.json -> PsiStoreDirectory with the appropriate path to save the recording. When you set the same and run the app, you should be able to see a "Meeting Recording" message on your teams call. Also, there is a specific format the recording happens so it can be analyzed by the [TeamsBot Tester](https://github.com/microsoftgraph/microsoft-graph-comms-samples/tree/master/Samples/PublicSamples/PsiBot/TeamsBotTester)
+
+5) Can I use the MS Teams Bot Application to join multiple calls?
+  
+Yes, it is possible. A single instance of the application handles or supports multiple calls. You can create one or more Teams Meeting, get the link so the "Bot" can join the meeting. However, please note, the more the meetings you have, the more system resources are getting consumed. Please make sure to upgrade the system configuration to support more. If in case of additional help required, Please feel free to reach out to the Sybml support through our [Community Slack](https://join.slack.com/t/symbldotai/shared_invite/zt-4sic2s11-D3x496pll8UHSJ89cm78CA) or our [forum](https://community.symbl.ai/?_ga=2.134156042.526040298.1609788827-1505817196.1609788827)
+  
 ## Community
 
 If you have any questions, feel free to reach out to us at devrelations@symbl.ai or through our [Community Slack](https://join.slack.com/t/symbldotai/shared_invite/zt-4sic2s11-D3x496pll8UHSJ89cm78CA) or our [forum](https://community.symbl.ai/?_ga=2.134156042.526040298.1609788827-1505817196.1609788827).
@@ -580,3 +615,4 @@ This guide is actively developed, and we love to hear from you! Please feel free
 ## License
 
 This library is released under the [MIT](https://github.com/SymblDev/symbl-livekit-rtc-app/blob/master/LICENSE.txt)
+
