@@ -217,7 +217,15 @@ Building great multi-tenant apps can be challenging because of the number of dif
 2. Select **Go to resource**. The bot and the related resources are listed in the resource group.
 Now your Azure bot has been created.
  ![AzureBotGotoResources](https://user-images.githubusercontent.com/2565797/160799543-a896ed98-f0fc-4ae0-8ed4-72afbb69a8f3.png)
+  
+Navigate to Channels and Enable MS Teams
 
+![Screenshot 2022-04-25 at 2 59 22 PM](https://user-images.githubusercontent.com/2565797/165068785-4455c5bd-1f45-4874-a670-dc970f79d60c.png)
+
+For the MS Teams Channel -> Calling - Make sure to "Enable calling", specify the NGROK URL with the /api/calling  
+
+![Screenshot 2022-04-25 at 2 59 31 PM](https://user-images.githubusercontent.com/2565797/165068769-24ed8f2b-6c2d-4dbe-b09a-8ce88fb3db69.png)  
+ 
 ## Step 4 - Setting up a custom domain
 
 We need to have a dedicated domain registered for this integration. You have the following choice. Either go with the existing domain registered via the domain provider or go with the Azure App Service Domain.
