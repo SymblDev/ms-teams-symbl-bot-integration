@@ -255,15 +255,15 @@ In your App Service Domain, [Create a TXT record](https://docs.microsoft.com/en-
 
 - Type: TXT
 
-- TTL: 3600
+- TTL: 60 Seconds
 
-- Value: \&lt;as copied TXT value from Terminal\&gt;
+- Value: As copied TXT value from Terminal
 
 ![DNSZone](https://user-images.githubusercontent.com/2565797/160800892-1a041cd2-a740-4022-86d1-f810fb499124.png)
 
 Please make use of the following command for generating the private certificate key file for Windows assuming you have successfully completed the certbot for generating the wildcard certificate.
-
-**openssl pkcs12 -export -out <certificate_name>.pfx -inkey <path_to_cert_files>/privkey.pem -in <path_to_cert_files>/cert.pem**
+  
+**openssl.exe pkcs12 -export -out symblteams.pfx -inkey <path_to_cert_files>/privkey.pem -in <path_to_cert_files>/fullchain.pem**
 
 Alternatively, If you have the PEM file, you can generate the cer file by making use of the PEM file.
 
@@ -326,12 +326,13 @@ Once the PFX certificate is generated from Step 5, the next step is to install t
 2. Create an ngrok config file as follows. Replace with the ngrok authentication token. Save it as, e.g., &quot;ngrok.yml&quot;.
 
 ```
-authtoken: YOUR_TOKEN
+version: "1"
+authtoken: YOUR_AUTH_TOKEN
 tunnels:
-signaling:
+ signaling:
    addr: https://localhost:9441
    proto: http
-media:
+ media:
    addr: 8445
    proto: tcp
 ```
