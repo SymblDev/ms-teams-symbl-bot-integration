@@ -58,7 +58,7 @@ namespace PsiBot.Services.Controllers
                                                     document.getElementById('conversationId'+callId).innerHTML = 'Conversation Id: '+ jsonResponse.message.conversationId;
                                                 }
 
-                                                if(jsonResponse.message.type === 'recognition_result')
+                                                if(jsonResponse.type === 'message' && jsonResponse.message.type === 'recognition_result')
                                                 {
                                                     document.getElementById('speaker'+callId).innerHTML = 'Speaker: '+ jsonResponse.message.user.name;
                                                     document.getElementById('cc-text'+callId).innerHTML = jsonResponse.message.punctuated.transcript;
@@ -207,6 +207,8 @@ namespace PsiBot.Services.Controllers
                                       if($(subscriberBtn).text() == ""Show Subscriber""){  
                                         $(subscriberInfo).css('display', 'block');
                                         $(subscriberBtn).text('Hide Subscriber');
+                                        console.log(""Subscribe URL:""+ jsonResponse.url);
+                                        console.log(""Call Id: ""+ callid);
                                         SubscribeToWebSocket(jsonResponse.url, callid);
                                       }else{
                                         $(subscriberInfo).css('display', 'none');

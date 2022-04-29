@@ -530,8 +530,8 @@ namespace System.Net.WebSockets.Managed
             {
                 // This exists purely to keep the connection alive; don't wait for the result, and ignore any failures.
                 // The call will handle releasing the lock.
-                Log.Information("PING from the client side");
-                SendFrameLockAcquiredNonCancelableAsync(MessageOpcode.Ping, true, new ArraySegment<byte>(new byte[0]));
+                // Log.Information("PONG from the client side");
+                SendFrameLockAcquiredNonCancelableAsync(MessageOpcode.Pong, true, new ArraySegment<byte>(new byte[0]));
             }
             else
             {

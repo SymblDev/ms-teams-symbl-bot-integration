@@ -18,7 +18,8 @@ namespace PsiBot.Services.Bot
     /// </summary>
     public class SymblWebSocketWrapper
     {
-        private const int ReceiveChunkSize = 8192;
+        private const int SendChunkSize = 1024;
+        private const int ReceiveChunkSize = 65536;
         private CancellationTokenSource cancellationTokenSource;
 
         private readonly Uri _uri;
@@ -28,11 +29,15 @@ namespace PsiBot.Services.Bot
         private Action<string, SymblWebSocketWrapper> _onMessage;
         private Action<SymblWebSocketWrapper> _onDisconnected;
 
+        private readonly CancellationToken _cancellationToken;
+        private readonly CancellationTokenSource _cancellationTokenSource = new CancellationTokenSource();
+
         protected SymblWebSocketWrapper(string uri)
         {
             _webSocketClient = new System.Net.WebSockets.Managed.ClientWebSocket();
-            _webSocketClient.Options.KeepAliveInterval = TimeSpan.FromSeconds(20);
+            _webSocketClient.Options.KeepAliveInterval = TimeSpan.FromSeconds(10);
             _uri = new Uri(uri);
+            _cancellationToken = _cancellationTokenSource.Token;
         }
 
         /// <summary>
@@ -148,7 +153,7 @@ namespace PsiBot.Services.Bot
             return new StartRequest
             {
                 type = "start_request",
-                meetingTitle = "Websockets How-to",
+                meetingTitle = "MSTeams Symbl Integration",
                 insightTypes = new System.Collections.Generic.List<string>
                 {
                     "question", "action_item"
@@ -183,12 +188,47 @@ namespace PsiBot.Services.Bot
                     throw new Exception("Connection is not open.");
                 }
 
-                await _webSocketClient.SendAsync(new ArraySegment<byte>(bytes, 0, bytes.Length),
-                          WebSocketMessageType.Binary, true, CancellationToken.None);
+                int offSet = 0;
+                foreach (var chunkedBytes in Split(bytes, SendChunkSize))
+                {
+                    if ((offSet + SendChunkSize) <= bytes.Length)
+                    {
+                        await _webSocketClient.SendAsync(new ArraySegment<byte>(bytes, offSet, SendChunkSize),
+                           WebSocketMessageType.Binary, true, _cancellationToken);
+                        offSet += SendChunkSize;
+                    }
+                }
+
+                int lastBytes = bytes.Length - offSet;
+                if (lastBytes > 0)
+                {
+                    await _webSocketClient.SendAsync(new ArraySegment<byte>(bytes, offSet, lastBytes),
+                           WebSocketMessageType.Binary, true, _cancellationToken);
+                }
             }
-            catch(Exception ex)
+            catch (Exception ex)
             {
-                LogDebugInfo("Error in SendMessageAsync bytes: " + ex.ToString(), true);
+                LogDebugInfo("Error in SendMessageAsync: " + ex.ToString(), true);
+            }
+        }
+
+        /// <summary>
+        /// https://stackoverflow.com/questions/11816295/splitting-a-byte-into-multiple-byte-arrays-in-c-sharp
+        /// </summary>
+        /// <param name="value"></param>
+        /// <param name="bufferLength"></param>
+        /// <returns></returns>
+        public static IEnumerable<byte[]> Split(byte[] value,
+            int bufferLength)
+        {
+            int countOfArray = value.Length / bufferLength;
+            if (value.Length % bufferLength > 0)
+                countOfArray++;
+
+            for (int i = 0; i < countOfArray; i++)
+            {
+                yield return value.Skip(i * bufferLength).Take(bufferLength)
+                    .ToArray();
             }
         }
 
