@@ -217,7 +217,15 @@ Building great multi-tenant apps can be challenging because of the number of dif
 2. Select **Go to resource**. The bot and the related resources are listed in the resource group.
 Now your Azure bot has been created.
  ![AzureBotGotoResources](https://user-images.githubusercontent.com/2565797/160799543-a896ed98-f0fc-4ae0-8ed4-72afbb69a8f3.png)
+  
+Navigate to Channels and Enable MS Teams
 
+![Screenshot 2022-04-25 at 2 59 22 PM](https://user-images.githubusercontent.com/2565797/165068785-4455c5bd-1f45-4874-a670-dc970f79d60c.png)
+
+For the MS Teams Channel -> Calling - Make sure to "Enable calling", specify the NGROK URL with the /api/calling  
+
+![Screenshot 2022-04-25 at 2 59 31 PM](https://user-images.githubusercontent.com/2565797/165068769-24ed8f2b-6c2d-4dbe-b09a-8ce88fb3db69.png)  
+ 
 ## Step 4 - Setting up a custom domain
 
 We need to have a dedicated domain registered for this integration. You have the following choice. Either go with the existing domain registered via the domain provider or go with the Azure App Service Domain.
@@ -255,15 +263,15 @@ In your App Service Domain, [Create a TXT record](https://docs.microsoft.com/en-
 
 - Type: TXT
 
-- TTL: 3600
+- TTL: 60 Seconds
 
-- Value: \&lt;as copied TXT value from Terminal\&gt;
+- Value: As copied TXT value from Terminal
 
 ![DNSZone](https://user-images.githubusercontent.com/2565797/160800892-1a041cd2-a740-4022-86d1-f810fb499124.png)
 
 Please make use of the following command for generating the private certificate key file for Windows assuming you have successfully completed the certbot for generating the wildcard certificate.
-
-**openssl pkcs12 -export -out <certificate_name>.pfx -inkey <path_to_cert_files>/privkey.pem -in <path_to_cert_files>/cert.pem**
+  
+**openssl.exe pkcs12 -export -out symblteams.pfx -inkey <path_to_cert_files>/privkey.pem -in <path_to_cert_files>/fullchain.pem**
 
 Alternatively, If you have the PEM file, you can generate the cer file by making use of the PEM file.
 
@@ -326,12 +334,13 @@ Once the PFX certificate is generated from Step 5, the next step is to install t
 2. Create an ngrok config file as follows. Replace with the ngrok authentication token. Save it as, e.g., &quot;ngrok.yml&quot;.
 
 ```
-authtoken: YOUR_TOKEN
+version: "1"
+authtoken: YOUR_AUTH_TOKEN
 tunnels:
-signaling:
+ signaling:
    addr: https://localhost:9441
    proto: http
-media:
+ media:
    addr: 8445
    proto: tcp
 ```
