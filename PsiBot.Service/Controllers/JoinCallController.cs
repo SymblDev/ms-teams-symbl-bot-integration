@@ -16,6 +16,8 @@ using System;
 using System.Net;
 using System.Net.Http;
 using System.Threading.Tasks;
+using SymblAISharp.Conversation;
+using Microsoft.AspNetCore.Http;
 
 namespace PsiBot.Services.Controllers
 {
@@ -53,6 +55,30 @@ namespace PsiBot.Services.Controllers
             _botService = botService;
             this.botConfiguration = botConfiguration.Value;
         }
+
+
+        [HttpGet]
+        [Route(HttpRouteConstants.ConversationAnalytics)]
+        public IActionResult ConversationAnalytics(string conversationId)
+        {
+            SymblAuth symblAuth = new SymblAuth();
+            var authResponse = symblAuth.GetAuthToken();
+            if(authResponse != null)
+            {
+                IConversationApi conversationApi = new ConversationApi(authResponse.accessToken);
+                var analyticsResponse = conversationApi.GetAnalytics(conversationId);
+                if(analyticsResponse != null)
+                {
+                    return Ok(analyticsResponse);
+                }
+                else
+                {
+                    return NotFound();
+                }
+            }
+            return StatusCode(StatusCodes.Status500InternalServerError);
+        }
+
 
         [HttpGet]
         [Route(HttpRouteConstants.SubscribeInfo)]

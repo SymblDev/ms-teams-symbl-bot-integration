@@ -57,6 +57,12 @@
     <ProjectReference Include="..\TeamsBot\TeamsBot.csproj" />
   </ItemGroup>
 
+  <ItemGroup>
+    <None Update="UI\index.html">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+  </ItemGroup>
+
   <ProjectExtensions><VisualStudio><UserProperties appsettings_1json__JsonSchema="https://json.schemastore.org/avro-avsc.json" /></VisualStudio></ProjectExtensions>
 
 </Project>

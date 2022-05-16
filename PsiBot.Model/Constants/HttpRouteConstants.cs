@@ -46,6 +46,11 @@ namespace PsiBot.Model.Constants
         public const string SubscribeInfo = "subscribe-info" + "/{callLegId}";
 
         /// <summary>
+        /// The route for conversation analytics
+        /// </summary>
+        public const string ConversationAnalytics = "analytics-info" + "/{conversationId}";
+
+        /// <summary>
         /// The route for getting the call.
         /// </summary>
         public const string CallRoute = Calls + "/{callLegId}";
