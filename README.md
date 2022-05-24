@@ -65,7 +65,7 @@ The following projects comprise this sample:
 
 ## High-Level Architecture of MS Teams Bot Symbl Integration
 
-![HighLevelArchitecture-MSTeamsSybml](https://user-images.githubusercontent.com/2565797/160795930-c680692b-aa82-484e-b90b-1d1003f5d88f.png)
+![HighLevelArchitecture-MSTeamsSybml](https://user-images.githubusercontent.com/2565797/170077613-5a83d6df-1ed6-482e-86cb-3c554d256155.png)
 
 ## Prerequisites
 
@@ -414,7 +414,7 @@ You should now have everything you need to run the bot and have it join a meetin
 3. Paste the meeting link and click on the &quot;Join Meeting&quot; button. It will take a few seconds for the Bot to join the Teams Meeting. If all goes well, you should be able to see the &quot;Bot&quot; joining the meeting.
 4. As and when the speaker(s) is communicating the live transcription should be displayed on the console. Simultaneously, it&#39;s possible to also subscribe from the browser and get the necessary information for making the **Symbl Subscribe API** (https://docs.symbl.ai/docs/subscribe-api).
 
-![TeamsBotUI](https://user-images.githubusercontent.com/2565797/160804825-b4377c4d-5910-457b-a95d-63c966ad49a3.png)
+![TeamsBotUI](https://user-images.githubusercontent.com/2565797/170078761-a12ee3b4-4ded-4308-89d5-959d4b146dd7.png)
 
 ## Azure Bot Pricing
 
@@ -555,7 +555,8 @@ Make sure to follow the "**MS Teams - Symbl Integration - Local Development Guid
 
 If you have completed Step 5, then you should be able to run the PsiBot Application with the application URL as **vm.{mydomain}.com/manage**
 
-![VMTeamsSybmlAppUI](https://user-images.githubusercontent.com/2565797/160811085-c9c3f737-a174-4031-96c9-d0e1986ca656.png)
+![MSTeamsUI](https://user-images.githubusercontent.com/2565797/170078761-a12ee3b4-4ded-4308-89d5-959d4b146dd7.png)
+
  
 </details>
   
