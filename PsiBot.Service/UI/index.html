@@ -24,16 +24,51 @@
     <script src="https://cdn.jsdelivr.net/npm/apexcharts"></script>
 
     <script type="text/javascript">
+        var colors = [];
+
+        function buildColors(members) {
+            for (var i = 0; i < members.length; i++) {
+                var randomColor = "#000000".replace(/0/g, function () { return (~~(Math.random() * 16)).toString(16); });
+                colors.push(randomColor);
+            }
+        }
+
+        function toFixed(num, fixed) {
+            var re = new RegExp('^-?\\d+(?:\.\\d{0,' + (fixed || -1) + '})?');
+            return num.toString().match(re)[0];
+        }
+
+        function displayCallDuration(metrics) {
+            var totalSilenceTime = metrics[0].seconds;
+            var totalTalkTime = metrics[1].seconds;
+            var totalOverlapTime = metrics[2].seconds;
+            var totalCallDuration = (totalSilenceTime + totalTalkTime) / 60;
+            var truncatedCallDuration = toFixed(totalCallDuration, 2);
+
+            var silenceTimeDuration = toFixed(totalSilenceTime / 60, 2);
+            var talkTimeDuration = toFixed(totalTalkTime / 60, 2);
+            var overlapTimeDuration = toFixed(totalOverlapTime / 60, 2);
+
+            $('#callSilenceDurationId').html(silenceTimeDuration.toString() + ' Mins');
+            $('#callTalkTimeDurationId').html(talkTimeDuration.toString() + ' Mins');
+            $('#overlapTimeDurationId').html(overlapTimeDuration.toString() + ' Mins');
+            $('#callDurationId').html(truncatedCallDuration.toString() + ' Mins');
+        }
+
         function renderPieChart(metrics) {
+
+            var totalSilenceTime = metrics[0].percent;
+            var totalTalkTime = metrics[1].percent;
+            var totalOverlapTime = metrics[2].percent;
+
             var options = {
-                series: [metrics[0].percent, metrics[1].percent, metrics[2].percent],
+                series: [totalSilenceTime, totalTalkTime, totalOverlapTime],
                 chart: {
                     width: 380,
                     type: 'pie',
                 },
                 labels: ['Total Silence', 'Total Talk Time', 'Total Overlap'],
                 responsive: [{
-                    breakpoint: 480,
                     options: {
                         chart: {
                             width: 400
@@ -49,13 +84,13 @@
             chart.render();
         }
 
-        function renderAnalyticsChart(members) {
+        function renderPaceAnalyticsChart(members) {
             var options = {
                 series: [],
                 chart: {
                     type: 'bar',
                     height: 350,
-                    stacked: true,
+                    stacked: false,
                     toolbar: {
                         show: true
                     },
@@ -64,7 +99,7 @@
                     }
                 },
                 responsive: [{
-                    breakpoint: 480,
+                    breakpoint: 500,
                     options: {
                         legend: {
                             position: 'bottom',
@@ -75,23 +110,113 @@
                 }],
                 plotOptions: {
                     bar: {
-                        horizontal: true,
-                    },
+                        borderRadius: 4,
+                        horizontal: false,
+                    }
+                },
+                stroke: {
+                    width: 1,
+                    colors: ['#fff']
                 },
                 xaxis: {
-                    categories: ['TalkTime', 'ListenTime', 'Pace', 'Overlap'],
+                    categories: ['Words Per Min'],
                 },
                 legend: {
                     position: 'right',
                     offsetY: 40
                 },
                 fill: {
-                    opacity: 1
-                }
+                    opacity: 1,
+                    colors: colors
+                },
+                colors: colors
             };
 
             for (var i = 0; i < members.length; i++) {
-                var data = [members[i].talkTime.percentage, members[i].listenTime.percentage, members[i].pace.wpm, members[i].overlap.overlapDuration];
+                var data = [members[i].pace.wpm];
+
+                var series = {
+                    name: members[i].name,
+                    data: data
+                }
+
+                options.series.push(series);
+            }
+
+            var chart = new ApexCharts(document.querySelector("#paceChartContainer"), options);
+            chart.render();
+        }
+
+        function renderAnalyticsChart(members) {
+
+            var options = {
+                series: [],
+                chart: {
+                    type: 'bar',
+                    height: 350,
+                    toolbar: {
+                        show: true
+                    },
+                    zoom: {
+                        enabled: true
+                    }
+                },
+                responsive: [{
+                    options: {
+                        legend: {
+                            position: 'bottom',
+                            offsetX: -10,
+                            offsetY: 0
+                        }
+                    }
+                }],
+                dataLabels: {
+                    enabled: true,
+                    offsetX: -6,
+                    style: {
+                        fontSize: '12px',
+                        colors: ['#fff']
+                    }
+                },
+                stroke: {
+                    show: true,
+                    width: 1,
+                    colors: colors
+                },
+                plotOptions: {
+                    bar: {
+                        horizontal: true,
+                        dataLabels: {
+                            position: 'top',
+                        },
+                    }
+                },
+                tooltip: {
+                    shared: true,
+                    intersect: false
+                },
+                xaxis: {
+                    categories: ['Talk Time (Mins)', 'Listen Time (Mins)', 'Overlap Time (Mins)'],
+                },
+                legend: {
+                    position: 'right',
+                    offsetY: 40,
+                    showForZeroSeries: true
+                },
+                fill: {
+                    opacity: 1,
+                    colors: colors
+                },
+                colors: colors
+            };
+
+            for (var i = 0; i < members.length; i++) {
+
+                var talkTime = toFixed(members[i].talkTime.seconds / 60, 2);
+                var listenTime = toFixed(members[i].listenTime.seconds / 60, 2);
+                var overlapTime = toFixed(members[i].overlap.overlapDuration / 60, 2);
+
+                var data = [talkTime, listenTime, overlapTime];
                 var series = {
                     name: members[i].name,
                     data: data
@@ -100,9 +225,7 @@
             }
 
             var chart = new ApexCharts(document.querySelector("#analyticsChartContainer"), options);
-
             chart.render();
-
         }
     </script>
 
@@ -128,9 +251,16 @@
                             var jsonResponse = JSON.parse(rsp);
                             console.log(jsonResponse);
                             if (jsonResponse.metrics != undefined) {
+                                $("#metricsChartContainer").empty();
+                                $("#analyticsChartContainer").empty();
+                                $("#paceChartContainer").empty();
                                 $('#conversationAnalyticsDiv').show();
+                                $('#conversationPaceH4').show();
+                                buildColors(jsonResponse.members);
                                 renderPieChart(jsonResponse.metrics);
                                 renderAnalyticsChart(jsonResponse.members);
+                                renderPaceAnalyticsChart(jsonResponse.members);
+                                displayCallDuration(jsonResponse.metrics);
                             }
                         });
                     }
@@ -214,6 +344,7 @@
             font-family: monospace;
             width: 100%;
             float: left;
+            margin-top: 20px;
         }
 
         /* Caption Styling */
@@ -372,13 +503,49 @@
                                 </div>
                             </div>
                         </div>
-                        <div class="row" id="conversationAnalyticsDiv">
-                            <h1>Conversation Analytics</h1>
+                        <div class="row" id="conversationAnalyticsDiv" style="margin: 20px;">
+                            <br />
+                            <br />
+                            <br />
+                            <br />
+                            <h2>Conversation Analytics</h2>
+                            <br />
+                            <br />
+                            <br />
+                            <br />
+                            <table class="table">
+                                <tr>
+                                    <th>Call Talk Time</th>
+                                    <th>Call Silence Time</th>
+                                    <th>Call Overlap Time</th>
+                                    <th>Total Call Duration</th>
+                                </tr>
+                                <tr>
+                                    <td id="callTalkTimeDurationId" style="font-size: x-large;"></td>
+                                    <td id="callSilenceDurationId" style="font-size: x-large;"></td>
+                                    <td id="overlapTimeDurationId" style="font-size: x-large;"></td>
+                                    <td id="callDurationId" style="font-size: x-large;"></td>
+                                </tr>
+                            </table>
+                            <br />
+                            <br />
+                            <br />
+                            <br />
+                            <br />
+                            <br />
                             <div class="col-sm-6">
+                                <h4>Conversation Metrics</h4>
                                 <div id="metricsChartContainer"></div>
                             </div>
                             <div class="col-sm-6">
+                                <h4>Conversation Member</h4>
                                 <div id="analyticsChartContainer"></div>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-sm-6">
+                                <h4 id="conversationPaceH4">Conversation Pace</h4>
+                                <div id="paceChartContainer"></div>
                             </div>
                         </div>
                     </div>
@@ -389,6 +556,7 @@
 
     <script type="text/javascript">
         $('#conversationAnalyticsDiv').hide();
+        $('#conversationPaceH4').hide();
         updateCalls();
     </script>
 </body>
