@@ -28,5 +28,8 @@ namespace PsiBot.Services.Bot
         public List<string> insightTypes { get; set; }
         public Config config { get; set; }
         public Speaker speaker { get; set; }
+        public int noConnectionTimeout { get; set; }
+        public int disconnectOnStopRequestTimeout { get; set; }
+        public bool disconnectOnStopRequest { get; set; }
     }
 }

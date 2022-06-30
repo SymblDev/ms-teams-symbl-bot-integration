@@ -55,27 +55,37 @@ namespace PsiBot.Services.Bot
 
             if(authResponse != null)
             {
-                Log.Logger.Information($"Access Token: " +
-                    $"{authResponse.accessToken}");
-
-                string uniqueMeetingId = GetUniqueMeetingId();
-                string symblEndpoint = $"wss://api.symbl.ai/v1/realtime/insights/{uniqueMeetingId}?access_token={authResponse.accessToken}";
-              
-                symblWebSocketWrapper = SymblWebSocketWrapper.Create(symblEndpoint);
-                symblWebSocketWrapper.Connect();
-                symblWebSocketWrapper.SendStartRequest(new Speaker
+                try
                 {
-                    name = speakerName,
-                    userId = speakerName.Replace(" ", "") + "@email.com"
-                });
+                    Log.Logger.Information($"Access Token: " +
+                        $"{authResponse.accessToken}");
 
-                Log.Logger.Information($"Unique Meeting Id: " +
-                    $"{uniqueMeetingId}");
+                    string uniqueMeetingId = GetUniqueMeetingId();
+                    string symblEndpoint = $"wss://api.symbl.ai/v1/realtime/insights/{uniqueMeetingId}?access_token={authResponse.accessToken}";
 
-                LogDebugInfo($"Unique Meeting Id: {uniqueMeetingId}");
-                LogDebugInfo($"Websocket Connection Opened " +
-                    $"for User Id: {participantId} " +
-                    $"and Speaker Name: {speakerName}");
+                    Speaker speaker = new Speaker
+                    {
+                        name = speakerName,
+                        userId = speakerName.Replace(" ", "") + "@email.com"
+                    };
+
+                    symblWebSocketWrapper = SymblWebSocketWrapper.Create(symblEndpoint, speaker);
+                    symblWebSocketWrapper.Connect();
+
+                    symblWebSocketWrapper.SendStartRequest(speaker);
+
+                    Log.Logger.Information($"Unique Meeting Id: " +
+                        $"{uniqueMeetingId}");
+
+                    LogDebugInfo($"Unique Meeting Id: {uniqueMeetingId}");
+                    LogDebugInfo($"Websocket Connection Opened " +
+                        $"for User Id: {participantId} " +
+                        $"and Speaker Name: {speakerName}");
+                }
+                catch(Exception ex)
+                {
+                    LogDebugInfo($"Error in CreateWebSocket: " + ex.StackTrace);
+                }
             }
         }
 
@@ -87,17 +97,38 @@ namespace PsiBot.Services.Bot
 
         public void SendAudio(byte[] audio)
         {
-            symblWebSocketWrapper.SendMessage(audio);
+            try
+            {
+                symblWebSocketWrapper.SendMessage(audio);
+            }
+            catch (Exception ex)
+            {
+                LogDebugInfo($"Error in SendAudio: " + ex.StackTrace);
+            }
         }
 
         public void Disconnect()
         {
-            symblWebSocketWrapper.Disconnect();
+            try
+            {
+                symblWebSocketWrapper.Disconnect();
+            }
+            catch (Exception ex)
+            {
+                LogDebugInfo($"Error in Disconnect: " + ex.StackTrace);
+            }
         }
 
         public void SendStopRequest()
         {
-            symblWebSocketWrapper.StopRequest("{\"type\": \"stop_request\"}");
+            try
+            {
+                symblWebSocketWrapper.StopRequest("{\"type\": \"stop_request\"}");
+            }
+            catch (Exception ex)
+            {
+                LogDebugInfo($"Error in SendStopRequest: " + ex.StackTrace);
+            }
         }
     }
 }

@@ -1,29 +1,30 @@
+using System;
+using System.Linq;
+using System.Text;
+using System.Net.WebSockets;
+using System.Threading;
+using System.Diagnostics;
+using System.Threading.Tasks;
+using System.Collections.Generic;
+using Newtonsoft.Json;
+using Serilog;
+
 namespace PsiBot.Services.Bot
 {
-    using System;
-    using System.Linq;
-    using System.Text;
-    using System.Net.WebSockets;
-    using System.Threading;
-    using System.Diagnostics;
-    using System.Threading.Tasks;
-    using System.Collections.Generic;
-    using Newtonsoft.Json;
-    using Serilog;
-    using System.IO;
-
-
     /// <summary>
     /// Reused and Refactored code from https://gist.github.com/xamlmonkey/4737291
     /// </summary>
     public class SymblWebSocketWrapper
     {
+        private Speaker speaker;
+        private int reConnectMaxCount = 1000;
         private const int SendChunkSize = 1024;
         private const int ReceiveChunkSize = 65536;
+        private const string MeetingTitle = "MSTeams Symbl Integration";
         private CancellationTokenSource cancellationTokenSource;
 
         private readonly Uri _uri;
-        private readonly System.Net.WebSockets.Managed.ClientWebSocket _webSocketClient;
+        private System.Net.WebSockets.Managed.ClientWebSocket _webSocketClient;
 
         private Action<SymblWebSocketWrapper> _onConnected;
         private Action<string, SymblWebSocketWrapper> _onMessage;
@@ -31,11 +32,13 @@ namespace PsiBot.Services.Bot
 
         private readonly CancellationToken _cancellationToken;
         private readonly CancellationTokenSource _cancellationTokenSource = new CancellationTokenSource();
+        private readonly object reconnectLock = new object();
 
-        protected SymblWebSocketWrapper(string uri)
+        protected SymblWebSocketWrapper(string uri, Speaker speaker)
         {
+            this.speaker = speaker;
             _webSocketClient = new System.Net.WebSockets.Managed.ClientWebSocket();
-            _webSocketClient.Options.KeepAliveInterval = TimeSpan.FromSeconds(10);
+            _webSocketClient.Options.KeepAliveInterval = TimeSpan.FromSeconds(20);
             _uri = new Uri(uri);
             _cancellationToken = _cancellationTokenSource.Token;
         }
@@ -45,9 +48,9 @@ namespace PsiBot.Services.Bot
         /// </summary>
         /// <param name="uri">The URI of the WebSocket server.</param>
         /// <returns></returns>
-        public static SymblWebSocketWrapper Create(string uri)
+        public static SymblWebSocketWrapper Create(string uri, Speaker speaker)
         {
-            return new SymblWebSocketWrapper(uri);
+            return new SymblWebSocketWrapper(uri, speaker);
         }
 
         /// <summary>
@@ -56,26 +59,64 @@ namespace PsiBot.Services.Bot
         /// <returns></returns>
         public SymblWebSocketWrapper Connect()
         {
-            cancellationTokenSource = new CancellationTokenSource();
-            _webSocketClient.ConnectAsync(_uri, cancellationTokenSource.Token)
-                .ConfigureAwait(false)
-                .GetAwaiter()
-                .GetResult();
-            CallOnConnected();
-            Task.Factory.StartNew(StartListen, cancellationTokenSource.Token,
-                TaskCreationOptions.LongRunning, TaskScheduler.Default)
-                .ConfigureAwait(false)
-                .GetAwaiter()
-                .GetResult();
-            return this;
+            try
+            {
+                cancellationTokenSource = new CancellationTokenSource();
+                _webSocketClient.ConnectAsync(_uri, cancellationTokenSource.Token)
+                    .ConfigureAwait(false)
+                    .GetAwaiter()
+                    .GetResult();
+                CallOnConnected();
+                Task.Factory.StartNew(StartListen, cancellationTokenSource.Token,
+                    TaskCreationOptions.LongRunning, TaskScheduler.Default)
+                    .ConfigureAwait(false)
+                    .GetAwaiter()
+                    .GetResult();
+                return this;
+            }
+            catch (Exception ex)
+            {
+                LogDebugInfo("Error in Connect: " + ex.ToString(), true);
+            }
+
+            return null;
+        }
+
+        public void ReConnect()
+        {
+            lock (reconnectLock)
+            {
+
+                LogDebugInfo("WebSocket State: " + _webSocketClient.State.ToString(), true);
+                if (reConnectMaxCount > 0)
+                {
+                    try
+                    {
+                        _webSocketClient = new System.Net.WebSockets.Managed.ClientWebSocket();
+
+                        _webSocketClient.ConnectAsync(_uri, cancellationTokenSource.Token)
+                            .ConfigureAwait(false)
+                            .GetAwaiter()
+                            .GetResult();
+                         SendStartRequest(speaker);
+                    }
+                    catch (Exception ex)
+                    {
+                        LogDebugInfo("Error in ReConnect: " + ex.ToString(), true);
+                    }
+                }
+                reConnectMaxCount = reConnectMaxCount - 1;
+            }
         }
 
         public void Disconnect()
         {
             try
             {
+                if (_webSocketClient == null)
+                    return;
                 _webSocketClient.CloseAsync(WebSocketCloseStatus.NormalClosure,
-                    string.Empty, CancellationToken.None)
+                    "Closing Websocket", CancellationToken.None)
                     .ConfigureAwait(false)
                     .GetAwaiter()
                     .GetResult();
@@ -153,8 +194,8 @@ namespace PsiBot.Services.Bot
             return new StartRequest
             {
                 type = "start_request",
-                meetingTitle = "MSTeams Symbl Integration",
-                insightTypes = new System.Collections.Generic.List<string>
+                meetingTitle = MeetingTitle,
+                insightTypes = new List<string>
                 {
                     "question", "action_item"
                 },
@@ -167,44 +208,60 @@ namespace PsiBot.Services.Bot
                         sampleRateHertz = 16000
                     }
                 },
+                noConnectionTimeout = 1800,
+                disconnectOnStopRequest = false,
+                disconnectOnStopRequestTimeout = 1800,
                 speaker = speaker
             };
         }
 
         public void SendMessage(byte[] bytes)
         {
-            SendMessageAsync(bytes)
-                .ConfigureAwait(false)
-                .GetAwaiter()
-                .GetResult();
+            try
+            {
+                SendMessageAsync(bytes)
+                    .ConfigureAwait(false)
+                    .GetAwaiter()
+                    .GetResult();
+            }
+            catch (Exception ex)
+            {
+                LogDebugInfo("Error in SendMessage: " + ex.ToString(), true);
+            }
         }
 
         private async Task SendMessageAsync(byte[] bytes)
         {
             try
             {
-                if (_webSocketClient.State != WebSocketState.Open)
+                if (_webSocketClient.State == WebSocketState.Open)
                 {
-                    throw new Exception("Connection is not open.");
-                }
-
-                int offSet = 0;
-                foreach (var chunkedBytes in Split(bytes, SendChunkSize))
-                {
-                    if ((offSet + SendChunkSize) <= bytes.Length)
+                    int offSet = 0;
+                    foreach (var chunkedBytes in Split(bytes, SendChunkSize))
                     {
-                        await _webSocketClient.SendAsync(new ArraySegment<byte>(bytes, offSet, SendChunkSize),
-                           WebSocketMessageType.Binary, true, _cancellationToken);
-                        offSet += SendChunkSize;
+                        if ((offSet + SendChunkSize) <= bytes.Length)
+                        {
+                            await _webSocketClient.SendAsync(new ArraySegment<byte>(bytes, offSet, SendChunkSize),
+                               WebSocketMessageType.Binary, true, _cancellationToken);
+                            offSet += SendChunkSize;
+                        }
+                    }
+
+                    int lastBytes = bytes.Length - offSet;
+                    if (lastBytes > 0)
+                    {
+                        await _webSocketClient.SendAsync(new ArraySegment<byte>(bytes, offSet, lastBytes),
+                               WebSocketMessageType.Binary, true, _cancellationToken);
                     }
                 }
-
-                int lastBytes = bytes.Length - offSet;
-                if (lastBytes > 0)
+                else
                 {
-                    await _webSocketClient.SendAsync(new ArraySegment<byte>(bytes, offSet, lastBytes),
-                           WebSocketMessageType.Binary, true, _cancellationToken);
+                    LogDebugInfo("Websocket Connection State is not Open in Method SendMessageAsync");
                 }
+            }
+            catch(WebSocketException ex)
+            {
+                ReConnect();
             }
             catch (Exception ex)
             {
@@ -237,15 +294,21 @@ namespace PsiBot.Services.Bot
         {
             try
             {
-                if (_webSocketClient.State != WebSocketState.Open)
+                if (_webSocketClient.State == WebSocketState.Open)
                 {
-                    throw new Exception("Connection is not open.");
+                    var messageBuffer = Encoding.UTF8.GetBytes(message);
+                    await _webSocketClient.SendAsync(new ArraySegment<byte>(messageBuffer,
+                                 0, messageBuffer.Length), WebSocketMessageType.Text,
+                                 true, CancellationToken.None);
                 }
-
-                var messageBuffer = Encoding.UTF8.GetBytes(message);
-                await _webSocketClient.SendAsync(new ArraySegment<byte>(messageBuffer,
-                             0, messageBuffer.Length), WebSocketMessageType.Text,
-                             true, CancellationToken.None);
+                else
+                {
+                    LogDebugInfo("Websocket Connection State is not Open in Method SendMessageAsync");
+                }
+            }
+            catch (WebSocketException ex)
+            {
+                ReConnect();
             }
             catch (Exception ex)
             {
@@ -268,7 +331,16 @@ namespace PsiBot.Services.Bot
                     do
                     {
                         result = await _webSocketClient.ReceiveAsync(new ArraySegment<byte>(buffer), loopToken);
-                        message.AddRange(new ArraySegment<byte>(buffer, 0, result.Count));
+                        if (result.MessageType == WebSocketMessageType.Close)
+                        {
+                            await _webSocketClient.CloseAsync(WebSocketCloseStatus.NormalClosure,
+                                string.Empty, CancellationToken.None);
+                            ReConnect();
+                        }
+                        else
+                        {
+                            message.AddRange(new ArraySegment<byte>(buffer, 0, result.Count));
+                        }
                     } while (!result.EndOfMessage);
 
                     if(message.Count > 0)
@@ -333,6 +405,7 @@ namespace PsiBot.Services.Bot
                     Console.WriteLine("Conversation Id: " + data.message.data.conversationId);
                     Log.Information("Conversation Id: "+ data.message.data.conversationId);
                 }
+
                 if(data.type == "message_response")
                 {
                     foreach(dynamic msg in data.messages)
@@ -340,6 +413,7 @@ namespace PsiBot.Services.Bot
                         Console.WriteLine("Transcript (more accurate): "+ msg.payload.content);
                     }
                 }
+
                 if(data.type == "topic_response")
                 {
                     foreach (dynamic topic in data.topics)
@@ -347,6 +421,7 @@ namespace PsiBot.Services.Bot
                         Console.WriteLine("Topic: " + topic.phrases);
                     }
                 }
+
                 if(data.type == "insight_response")
                 {
                     foreach (dynamic insight in data.insights)
@@ -354,6 +429,7 @@ namespace PsiBot.Services.Bot
                         Console.WriteLine("Insight: " + insight.payload.content);
                     }
                 }
+
                 if(data.type == "message" && data.message.punctuated != null)
                 {
                     Console.WriteLine("Live transcript (less accurate): " + data.message.punctuated.transcript);
