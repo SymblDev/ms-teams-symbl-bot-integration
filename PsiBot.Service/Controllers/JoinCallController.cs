@@ -18,6 +18,7 @@ using System.Net.Http;
 using System.Threading.Tasks;
 using SymblAISharp.Conversation;
 using Microsoft.AspNetCore.Http;
+using System.Runtime.Caching;
 
 namespace PsiBot.Services.Controllers
 {
@@ -41,6 +42,9 @@ namespace PsiBot.Services.Controllers
         /// </summary>
         private readonly BotConfiguration botConfiguration;
 
+        ObjectCache cache = MemoryCache.Default;
+        private string ConversationIdCacheKey = "ConversationIdCacheKey";
+
         /// <summary>
         /// Initializes a new instance of the <see cref="JoinCallController" /> class.
 
@@ -59,11 +63,20 @@ namespace PsiBot.Services.Controllers
 
         [HttpGet]
         [Route(HttpRouteConstants.ConversationAnalytics)]
-        public IActionResult ConversationAnalytics(string conversationId)
+        public IActionResult ConversationAnalytics(string callLegId)
         {
+            if(!_botService.CallHandlers.ContainsKey(callLegId))
+                return NotFound();
+
+            var callHandler = _botService.CallHandlers[callLegId];
+            string conversationId = (string)cache.Get(string.Format("{0}-{1}", ConversationIdCacheKey, callHandler.Call.Id));
+
+            if (conversationId == null)
+                return NotFound();
+
             SymblAuth symblAuth = new SymblAuth();
             var authResponse = symblAuth.GetAuthToken();
-            if(authResponse != null)
+            if(authResponse != null && conversationId != null)
             {
                 IConversationApi conversationApi = new ConversationApi(authResponse.accessToken);
                 var analyticsResponse = conversationApi.GetAnalytics(conversationId);

@@ -69,7 +69,7 @@ namespace PsiBot.Services.Bot
                         userId = speakerName.Replace(" ", "") + "@email.com"
                     };
 
-                    symblWebSocketWrapper = SymblWebSocketWrapper.Create(symblEndpoint, speaker);
+                    symblWebSocketWrapper = SymblWebSocketWrapper.Create(symblEndpoint, speaker, callId);
                     symblWebSocketWrapper.Connect();
 
                     symblWebSocketWrapper.SendStartRequest(speaker);

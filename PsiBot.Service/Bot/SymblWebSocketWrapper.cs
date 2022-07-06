@@ -8,6 +8,7 @@ using System.Threading.Tasks;
 using System.Collections.Generic;
 using Newtonsoft.Json;
 using Serilog;
+using System.Runtime.Caching;
 
 namespace PsiBot.Services.Bot
 {
@@ -22,6 +23,7 @@ namespace PsiBot.Services.Bot
         private const int ReceiveChunkSize = 65536;
         private const string MeetingTitle = "MSTeams Symbl Integration";
         private CancellationTokenSource cancellationTokenSource;
+        private readonly string callId;
 
         private readonly Uri _uri;
         private System.Net.WebSockets.Managed.ClientWebSocket _webSocketClient;
@@ -34,9 +36,15 @@ namespace PsiBot.Services.Bot
         private readonly CancellationTokenSource _cancellationTokenSource = new CancellationTokenSource();
         private readonly object reconnectLock = new object();
 
-        protected SymblWebSocketWrapper(string uri, Speaker speaker)
+
+        ObjectCache cache = MemoryCache.Default;
+        bool isConversationIdCached = false;
+        private string ConversationIdCacheKey = "ConversationIdCacheKey";
+
+        protected SymblWebSocketWrapper(string uri, Speaker speaker, string callId)
         {
             this.speaker = speaker;
+            this.callId = callId; 
             _webSocketClient = new System.Net.WebSockets.Managed.ClientWebSocket();
             _webSocketClient.Options.KeepAliveInterval = TimeSpan.FromSeconds(20);
             _uri = new Uri(uri);
@@ -48,9 +56,9 @@ namespace PsiBot.Services.Bot
         /// </summary>
         /// <param name="uri">The URI of the WebSocket server.</param>
         /// <returns></returns>
-        public static SymblWebSocketWrapper Create(string uri, Speaker speaker)
+        public static SymblWebSocketWrapper Create(string uri, Speaker speaker, string callId)
         {
-            return new SymblWebSocketWrapper(uri, speaker);
+            return new SymblWebSocketWrapper(uri, speaker, callId);
         }
 
         /// <summary>
@@ -208,9 +216,9 @@ namespace PsiBot.Services.Bot
                         sampleRateHertz = 16000
                     }
                 },
-                noConnectionTimeout = 1800,
+                noConnectionTimeout = 120,
                 disconnectOnStopRequest = false,
-                disconnectOnStopRequestTimeout = 1800,
+                disconnectOnStopRequestTimeout = 60,
                 speaker = speaker
             };
         }
@@ -383,11 +391,10 @@ namespace PsiBot.Services.Bot
 
         private static void RunInTask(Action action)
         {
-            LogDebugInfo("RunInTask", false);
             Task.Factory.StartNew(action);
         }
 
-        private static void LogDebugInfo(string message, bool isError = false)
+        private void LogDebugInfo(string message, bool isError = false)
         {
             try
             {
@@ -400,10 +407,17 @@ namespace PsiBot.Services.Bot
                 dynamic jsonObject = JsonConvert.DeserializeObject<dynamic>(message);
                 dynamic data = jsonObject;
 
-                if(data.type == "message" && data.message.data != null)
+                string cachedConversationId = (string)cache.Get(string.Format("{0}-{1}", ConversationIdCacheKey, callId));
+                if (!string.IsNullOrEmpty(cachedConversationId))
+                    isConversationIdCached = true;
+
+                if(data.type == "message" && data.message.data != null && isConversationIdCached == false)
                 {
                     Console.WriteLine("Conversation Id: " + data.message.data.conversationId);
                     Log.Information("Conversation Id: "+ data.message.data.conversationId);
+
+                    cache.Set(string.Format("{0}-{1}", ConversationIdCacheKey, callId), data.message.data.conversationId.ToString(), 
+                        DateTimeOffset.Now.Add(TimeSpan.FromHours(24)));
                 }
 
                 if(data.type == "message_response")

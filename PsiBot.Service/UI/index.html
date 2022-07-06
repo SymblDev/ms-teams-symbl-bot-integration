@@ -230,7 +230,34 @@
     </script>
 
     <script type="text/javascript">
+        var callLegId;
+
+        function renderAnalytics() {
+            api('GET', 'analytics-info/' + callLegId, null, rsp => {
+                var jsonResponse = JSON.parse(rsp);
+                console.log(jsonResponse);
+                if (jsonResponse.metrics != undefined) {
+                    $("#metricsChartContainer").empty();
+                    $("#analyticsChartContainer").empty();
+                    $("#paceChartContainer").empty();
+                    $('#conversationAnalyticsDiv').show();
+                    $('#conversationPaceH4').show();
+                    buildColors(jsonResponse.members);
+                    renderPieChart(jsonResponse.metrics);
+                    renderAnalyticsChart(jsonResponse.members);
+                    renderPaceAnalyticsChart(jsonResponse.members);
+                    displayCallDuration(jsonResponse.metrics);
+                }
+            });
+        }
+
+        setInterval(() => {
+            renderAnalytics();
+        }, "20000");
+
         function SubscribeToWebSocket(url, callId) {
+            callLegId = callId;
+
             if ("WebSocket" in window) {
                 // Let us open a web socket
                 var ws = new WebSocket(url);
@@ -246,23 +273,6 @@
                     if (jsonResponse.type === 'message' && jsonResponse.message.type === 'conversation_completed') {
                         console.log('conversationId: ' + jsonResponse.message.conversationId);
                         document.getElementById('conversationId' + callId).innerHTML = 'Conversation Id: ' + jsonResponse.message.conversationId;
-
-                        api('GET', 'analytics-info/' + jsonResponse.message.conversationId, null, rsp => {
-                            var jsonResponse = JSON.parse(rsp);
-                            console.log(jsonResponse);
-                            if (jsonResponse.metrics != undefined) {
-                                $("#metricsChartContainer").empty();
-                                $("#analyticsChartContainer").empty();
-                                $("#paceChartContainer").empty();
-                                $('#conversationAnalyticsDiv').show();
-                                $('#conversationPaceH4').show();
-                                buildColors(jsonResponse.members);
-                                renderPieChart(jsonResponse.metrics);
-                                renderAnalyticsChart(jsonResponse.members);
-                                renderPaceAnalyticsChart(jsonResponse.members);
-                                displayCallDuration(jsonResponse.metrics);
-                            }
-                        });
                     }
 
                     if (jsonResponse.type === 'message' &&
@@ -406,6 +416,7 @@
             api('POST', 'joinCall', { JoinURL: meetingUrl }, _ => { updateCalls(); });
         }
         function leave(legId) {
+            renderAnalytics();
             api('DELETE', 'calls/' + legId, null, _ => { window.setTimeout(updateCalls, 2000); });
         }
         function scrollToBottom(id) {
