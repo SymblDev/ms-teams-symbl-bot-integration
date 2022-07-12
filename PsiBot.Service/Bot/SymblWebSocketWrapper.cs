@@ -217,8 +217,7 @@ namespace PsiBot.Services.Bot
                     }
                 },
                 noConnectionTimeout = 120,
-                disconnectOnStopRequest = false,
-                disconnectOnStopRequestTimeout = 60,
+                disconnectOnStopRequest = true,
                 speaker = speaker
             };
         }
