@@ -1,6 +1,6 @@
 This is a POC which shows how to integrate [Symbl.ai](https://symbl.ai/) with MS Teams and getting per participant the meeting conversation transcripts and insights in real-time using an existing sample application created by MS Platform for Situated Intelligence ([Psi](https://github.com/microsoftgraph/microsoft-graph-comms-samples/tree/master/Samples/PublicSamples/PsiBot)) Teams bot. You can find more details on the original code created by MS Psi Teams bot sample application here [microsoft-graph-comms-samples](https://github.com/microsoftgraph/microsoft-graph-comms-samples).
 
-The MS Teams Symbl Integration Guide focuses on the local development where you are free to use your "Windows" machine for development/testting or may use the Azure infrastructure too. Up next, you'll see a dedicated section for "Azure" Development; Where you can spin up the Azure VM and develop or deploy the solution.
+The MS Teams Symbl Integration Guide focuses on the local development where you are free to use your "Windows" machine for development/testing or may use the Azure infrastructure too. Up next, you'll see a dedicated section for "Azure" Development; Where you can spin up the Azure VM and develop or deploy the solution.
 
 ## Local Development Guide
 
