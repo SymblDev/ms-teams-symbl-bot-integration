@@ -300,6 +300,16 @@ In your App Services Domain, map the CNAME entry so any request to **local.{mydo
 
 Install the generated certificate into your system certificate manager. Look it up in the manager and take note of the THUMBPRINT for later.Step
 
+Note - If you happened to generate the free SSL certificate using Lets Encrypt, then you need to renew the certificate every 3 months. Here's how you can do it by running the certbot command.
+
+## Step 5.1 - Renewal of the SSL certificate for your domain
+
+C:\Program Files\Certbot>certbot -d *.<domain_name> --manual --preferred-challenges dns certonly
+
+Follow the instructions to update the challenge key and press enter to renew the certificate after the TTL period. Once the cert is renewed, the next step is to use the OpenSSL for generating the pfx file. Below is the command.
+
+**C:\Program Files\OpenSSL-Win64\bin>openssl pkcs12 -export -out certificate.pfx -inkey privkey.pem -in cert.pem**
+
 ## Step 6 - Setting up the private certificate
 
 Once the PFX certificate is generated from Step 5, the next step is to install the same on your local &quot;Windows&quot; development machine.
