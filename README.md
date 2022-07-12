@@ -2,11 +2,7 @@ This is a POC which shows how to integrate [Symbl.ai](https://symbl.ai/) with MS
 
 The MS Teams Symbl Integration Guide focuses on the local development where you are free to use your "Windows" machine for development/testing or may use the Azure infrastructure too. Up next, you'll see a dedicated section for "Azure" Development; Where you can spin up the Azure VM and develop or deploy the solution.
 
-## Local Development Guide
-
-<details>
-<summary>Click to expand!</summary>
-  
+# Introduction
 
 In this playbook, you will be presented with the MS Teams and Sybml integration to get real-time transcriptions and insights using Symbl APIs. We will be leveraging and extending the Psi Bot which is an open-source MS Teams Bot implementation developed by MS [Platform for Situated Intelligence (\psi)](https://github.com/microsoftgraph/microsoft-graph-comms-samples/tree/master/Samples/PublicSamples/PsiBot).
 
@@ -109,6 +105,11 @@ Workloads:
 If you are not familiar with Platform for Situated Intelligence, you&#39;ll first want to acquaint yourself with some fundamental concepts. The [GitHub page](https://github.com/microsoft/psi) has lots of documentation for familiarizing yourself with the framework, including a [wiki](https://github.com/microsoft/psi/wiki), [samples](https://github.com/Microsoft/psi-samples), [tutorials](https://github.com/microsoft/psi/wiki/Tutorials), and more. A great place to get started is the [Brief Introduction](https://github.com/microsoft/psi/wiki/Brief-Introduction) tutorial.
 
 In the next steps, we&#39;ll walk through how to initialize your bot and other necessary resources in Azure. Following these instructions will enable you to execute the bot on your local development machine.
+
+## Local Development Guide
+
+<details>
+<summary>Click to expand!</summary>
 
 ## Step 1: Setting up the Source Code
 
