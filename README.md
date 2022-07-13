@@ -2,8 +2,11 @@ This is a POC which shows how to integrate [Symbl.ai](https://symbl.ai/) with MS
 
 The MS Teams Symbl Integration Guide focuses on the local development where you are free to use your "Windows" machine for development/testing or may use the Azure infrastructure too. Up next, you'll see a dedicated section for "Azure" Development; Where you can spin up the Azure VM and develop or deploy the solution.
 
-# Introduction
+## Introduction
 
+<details>
+<summary>Click to expand!</summary>
+  
 In this playbook, you will be presented with the MS Teams and Sybml integration to get real-time transcriptions and insights using Symbl APIs. We will be leveraging and extending the Psi Bot which is an open-source MS Teams Bot implementation developed by MS [Platform for Situated Intelligence (\psi)](https://github.com/microsoftgraph/microsoft-graph-comms-samples/tree/master/Samples/PublicSamples/PsiBot).
 
 Before taking a deep dive into the internals of the MS Teams Bot implementation, let&#39;s try to understand what is a &quot;Bot&quot;, then get a basic understanding of the Psi Bot, Symbl API capabilities etc.
@@ -106,6 +109,8 @@ If you are not familiar with Platform for Situated Intelligence, you&#39;ll firs
 
 In the next steps, we&#39;ll walk through how to initialize your bot and other necessary resources in Azure. Following these instructions will enable you to execute the bot on your local development machine.
 
+</details>
+  
 ## Local Development Guide
 
 <details>
@@ -426,6 +431,9 @@ You should now have everything you need to run the bot and have it join a meetin
 4. As and when the speaker(s) is communicating the live transcription should be displayed on the console. Simultaneously, it&#39;s possible to also subscribe from the browser and get the necessary information for making the **Symbl Subscribe API** (https://docs.symbl.ai/docs/subscribe-api).
 
 ![TeamsBotUI](https://user-images.githubusercontent.com/2565797/170078761-a12ee3b4-4ded-4308-89d5-959d4b146dd7.png)
+  
+<img width="1350" alt="Conversation Analytics" src="https://user-images.githubusercontent.com/2565797/178662933-d68f444c-f474-4419-8366-318ad25579ca.png">
+
 
 ## Azure Bot Pricing
 
